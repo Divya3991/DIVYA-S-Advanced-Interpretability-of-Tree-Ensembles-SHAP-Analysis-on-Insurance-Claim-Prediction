@@ -1,0 +1,2 @@
+# DIVYA-S-Advanced-Interpretability-of-Tree-Ensembles-SHAP-Analysis-on-Insurance-Claim-Prediction
+Insurance Claim Severity Prediction — SHAP Analysis  This project builds an advanced gradient boosting model (XGBoost) to predict insurance claim severity and uses SHAP (Shapley Additive Explanations) for global and local interpretability. The goal is to understand which policyholder and vehicle features drive risk and claim severity.
