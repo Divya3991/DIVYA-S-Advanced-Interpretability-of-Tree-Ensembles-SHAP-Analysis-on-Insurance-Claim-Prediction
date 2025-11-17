@@ -1,0 +1,188 @@
+Task 4: Detailed Interpretation of Global and Local SHAP Findings
+
+This section synthesizes the global SHAP feature importance with the three local SHAP case studies (low-severity, high-severity, and outlier). Together, these analyses explain how the model arrives at predictions and how specific feature interactions influence risk assessment in insurance claim severity.
+
+1. Global SHAP Interpretation: Overall Drivers of Claim Severity
+
+Global SHAP importance values describe how much each feature contributes, on average, across the entire dataset. The global ranking derived from mean absolute SHAP values is:
+
+vehicle_age
+
+age
+
+gender_M
+
+gender_F
+
+vehicle_value
+
+prior_claims
+
+policy_deductible
+
+These findings reveal several key patterns:
+
+1. vehicle_age is the dominant driver of severity
+
+Older vehicles have higher repair or replacement costs due to parts availability, structural wear, and safety degradation. The model consistently assigns large positive SHAP contributions to older cars and strong negative contributions to newer ones.
+
+2. policyholder age strongly affects predicted severity
+
+Extreme age ranges tend to correlate with higher severity, while mid-range ages reduce risk. This interaction appears consistently in both global and local analyses.
+
+3. Gender variables interact with age and vehicle features
+
+Individually, gender columns show moderate global importance, but in the local case studies, the effect of gender varies depending on other features. This indicates nonlinear interactions captured by the tree model.
+
+4. vehicle_value and prior_claims influence risk but at lower magnitude
+
+Higher vehicle_value modestly increases claim severity.
+Prior_claims provides minimal overall impact globally, meaning historical claims alone are not a strong driver of severity in this dataset.
+
+5. policy_deductible slightly reduces severity
+
+Higher deductibles have small negative SHAP values, which aligns with insurance design, where higher deductibles reduce claim costs.
+
+2. Synthesis of Global and Local Findings
+
+The local case analyses complement global insights by showing how the same feature can push the prediction differently for different policyholders. This highlights nonlinear interactions and conditional dependencies.
+
+Case 1: Low-Severity Case — Strong Negative Interactions
+
+In the low-severity case, both vehicle_age and policyholder age produce large negative contributions.
+This is consistent with the global SHAP ranking, but the magnitude is much more extreme locally.
+
+Why?
+
+The model learns that certain combinations dramatically reduce risk:
+
+A newer vehicle
+
+A low-risk driver age group
+
+Demographic factors (gender_F or gender_M) that align with historically low severity patterns
+
+This demonstrates that SHAP does not assign fixed effects. The influence of a feature depends on its interaction with others.
+
+Case 2: High-Severity Case — Compounding Positive Effects
+
+In the high-severity case:
+
+vehicle_age contributes more than +3000
+
+age contributes more than +2800
+
+gender_F and gender_M add positive values
+
+vehicle_value and deductible give small upward adjustments
+
+Compared to global averages, these contributions are much higher. This shows that extreme feature values interact to produce compounding effects.
+
+Key interaction example:
+
+Old vehicle age combined with a high-risk driver age group dramatically amplifies severity. These features independently increase risk, but together their SHAP effects are significantly larger than either alone.
+
+This confirms that the model captures nonlinear interactions effectively, such as older drivers operating older vehicles being a particularly high-risk profile.
+
+Case 3: Outlier Case — Conflicting SHAP Contributions
+
+The outlier case displays:
+
+Strong negative effects (vehicle_age, age, gender_F)
+
+Moderate positive effects (gender_M, vehicle_value)
+
+Despite being one-hot encoded (only one gender active), some categorical encodings show subtle interactions that lead to mixed contributions.
+
+Interpretation:
+
+The model encounters an unusual feature combination that does not fit typical low- or high-severity patterns. Some features push severity up while others push it down. The result is an intermediate or unexpected severity value.
+
+Why this matters:
+
+Outliers help reveal the model’s sensitivity to rare combinations.
+
+They validate that the model is not dominated solely by global patterns.
+
+They highlight how SHAP exposes conditional dependencies across features.
+
+3. Feature Interaction Patterns Identified Across SHAP Analyses
+
+Combining global and local SHAP reveals several interaction behaviors:
+
+1. vehicle_age × age interaction
+
+When both the vehicle is old and the driver is in a high-risk age category, their contributions increase dramatically. Conversely, low-risk vehicle age and driver age also amplify each other in reducing severity.
+
+2. demographic variables interact with risk features
+
+Global SHAP ranking shows moderate importance for gender_M and gender_F.
+Local SHAP demonstrates that the effect of gender is not uniform.
+Gender interacts with:
+
+vehicle_age
+
+age
+
+vehicle_value
+
+In some local cases, gender_F reduces risk, while in others it increases risk depending on the surrounding feature context.
+
+3. vehicle_value interacts with vehicle_age
+
+High vehicle_value amplifies the severity impact of old vehicle_age, but has only minor impact when the vehicle is new or mid-aged.
+
+4. prior_claims interacts with multiple features
+
+Globally weak, locally variable.
+In high-risk cases with old vehicles, prior_claims has almost no impact.
+In low-risk cases, even small prior_claims values may have tiny negative or positive influences.
+This suggests prior_claims affects risk only when other risk signals are weak.
+
+4. How These Interactions Influence Overall Risk Assessment
+
+SHAP analysis shows that the model does not rely on simple linear relationships.
+Risk is assessed using combinations of features.
+Key takeaways:
+
+1. The model heavily emphasizes structural vehicle risk
+
+Consistent with insurance domain logic, the condition and age of the vehicle are primary severity drivers.
+
+2. Socio-demographic factors influence risk only conditionally
+
+Gender and age do not independently determine severity; they interact with vehicle characteristics and historical claim behavior.
+
+3. The model’s risk predictions are context-dependent
+
+Two policyholders with the same vehicle age can receive wildly different severity predictions depending on:
+
+their demographic profile
+
+deductible size
+
+vehicle value
+
+prior claim history
+
+4. SHAP validates model trustworthiness
+
+The feature interactions make sense from a business standpoint:
+
+Newer cars reduce claim costs
+
+Older cars increase them
+
+High-risk age demographics increase severity
+
+Deductibles reduce payouts
+
+The model aligns with expected industry dynamics.
+
+5. Final Summary
+
+The SHAP global analysis identifies vehicle_age and policyholder age as the most influential features in determining claim severity.
+Local SHAP case studies confirm that these features interact with demographic and financial variables in nonlinear ways, producing individualized predictions.
+
+The model’s risk assessment is based on contextual feature interactions, not single-variable effects.
+This results in predictions that are both data-driven and aligned with insurance domain expectations.
