@@ -1,0 +1,132 @@
+Task 5: Concluding Section on Model Biases and Unexpected Behaviors
+
+The SHAP-based analysis reveals both expected model behavior and several areas where potential biases or unexpected patterns could affect business decisions. While the model demonstrates strong performance and aligns with insurance domain logic, several findings require attention before deployment in a real-world risk assessment environment.
+
+1. Potential Demographic Biases
+1. Gender-related inconsistencies
+
+The SHAP results show that gender_M and gender_F sometimes produce opposite effects across different observations, despite being one-hot encoded representations of the same categorical variable. Surprisingly, gender shows moderate global importance despite having no direct causal relationship with claim severity.
+
+Potential business impact:
+
+The model may unintentionally learn correlations from historical data that reflect biased underwriting or sociological patterns rather than true risk.
+
+Using demographic attributes such as gender in pricing or claims predictions may violate fairness regulations in some jurisdictions.
+
+Recommendation:
+Consider auditing the model with fairness constraints or removing gender if it influences outcomes in a way that does not align with ethical or regulatory requirements.
+
+2. Overreliance on vehicle_age for risk decisions
+
+The global SHAP ranking heavily prioritizes vehicle_age, and local SHAP analyses show extremely large contributions (both positive and negative). In high- and low-severity cases, vehicle_age alone can push predicted severity by several thousand units.
+
+Unexpected behavior:
+
+vehicle_age appears to dominate the model more strongly than expected relative to other features.
+
+In some local cases, its magnitude is far larger than the true claim variance suggests.
+
+Potential business impact:
+
+Automated decisions may overpenalize older vehicles or underestimate risk for newer ones.
+
+This concentration of influence could lead to unfair premium decisions or mispriced policies.
+
+Recommendation:
+Monitor the sensitivity of model outputs to vehicle_age and calibrate predictions to avoid overreacting to age extremes.
+
+3. Weak and inconsistent effect of prior_claims
+
+Globally, prior_claims shows very low importance, even though historical claim frequency is typically a strong predictor in insurance models. In the local analyses, prior_claims sometimes has almost no effect, even for high-risk individuals.
+
+Unexpected behavior:
+
+The model underweights claim history compared to common actuarial expectations.
+
+This may be caused by interactions overshadowing prior_claims, or by insufficient representation of claim frequency patterns in the dataset.
+
+Potential business impact:
+
+High-risk repeat claimants may not receive appropriate severity predictions.
+
+Downstream underwriting or fraud detection processes relying on this model could be weakened.
+
+Recommendation:
+Review data preprocessing and distribution for prior_claims and consider feature engineering or reweighting.
+
+4. Interaction-driven prediction volatility
+
+Local SHAP profiles reveal that certain combinations of features produce unusually high or low contributions, and that some contributions change direction depending on context. This includes:
+
+gender behaving oppositely in different scenarios
+
+vehicle_value contributing positively only in specific ranges
+
+age strongly increasing risk only when paired with old vehicles
+
+Unexpected behavior:
+The model demonstrates high sensitivity to specific feature interactions that do not always generalize well.
+
+Potential business impact:
+
+Predictions may fluctuate unpredictably for customers with rare attribute combinations.
+
+Outlier decisions could misinform claims triage, underwriting, or fraud investigation.
+
+Recommendation:
+Conduct stability tests, such as permutation-based sensitivity analysis, to ensure consistent predictions for rare feature combinations.
+
+5. Outlier case indicates model uncertainty
+
+The “outlier case” SHAP analysis shows mixed contributions from opposing features, where small changes in input values could dramatically shift the prediction. This suggests a region of the feature space where the model has low confidence.
+
+Unexpected behavior:
+
+Conflicting SHAP values signal potential data sparsity or instability.
+
+The model may extrapolate rather than interpolate, increasing uncertainty.
+
+Potential business impact:
+
+Underwriting decisions for rare customer profiles may be unreliable.
+
+Business teams could misinterpret inconsistent predictions as meaningful patterns.
+
+Recommendation:
+Flag such outlier profiles for manual review or require additional data validation before using model predictions operationally.
+
+6. Regulatory and ethical considerations
+
+Several features with predictive power (gender, age) may raise compliance concerns depending on jurisdiction.
+Even if technically predictive, using these fields in automated decisions may conflict with:
+
+Anti-discrimination laws
+
+Fairness guidelines
+
+Internal company ethics policies
+
+Potential business impact:
+
+Legal challenges
+
+Customer trust issues
+
+Reputational risk
+
+Recommendation:
+Perform a formal fairness audit and create a policy on how demographic variables should be used in actuarial models.
+
+7. Summary of Key Risks
+
+The SHAP analysis provides transparency that reveals both strengths and risks. The most critical issues include:
+
+High sensitivity to vehicle_age that may distort predictions
+
+Demographic-variable interactions that may imply bias
+
+Weak influence of prior_claims compared to actuarial expectations
+
+Vulnerability to rare or outlier feature combinations
+
+Addressing these issues will help ensure the model is trustworthy, fair, and suitable for deployment in insurance decision-making.
